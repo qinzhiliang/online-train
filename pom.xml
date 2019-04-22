@@ -62,28 +62,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
-        <!--fasdf//////////////////////////////-->
-        <dependency>
-            <groupId>com.mintq</groupId>
-            <artifactId>certificationmodel</artifactId>
-            <version>2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mintq</groupId>
-            <artifactId>certifiationadapter</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.mintq</groupId>
-            <artifactId>certification-api-interface</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mintq</groupId>
-            <artifactId>certification-api-model</artifactId>
-            <version>2.1</version>
-        </dependency>
     </dependencies>
 
     <build>
