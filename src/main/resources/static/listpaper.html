@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>预览试卷</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+    <script>
+        var getParam = function (pattern) {
+            var page = 1;
+            var params = location.href.split("&");
+            for (var i = 0; i < params.length; i++) {
+                var index = params[i].lastIndexOf(pattern);
+                if (index != -1) {
+                    page = params[i].substring(index + pattern.length);
+                }
+            }
+            return page;
+        }
+
+        $(function () {
+            var page = getParam("page=");
+            $.ajax({
+                type: "GET",
+                url: addr + "/api/papers?page=" + page,
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    var html = template("listpagerinfo", { data: data });
+                    $("#main").html(html);
+                    var pager = template("pagerinfo", { data: data });
+                    $(".pager").html(pager);
+                }
+            });
+        })
+    </script>
+</head>
+
+<body>
+    <script id="listpagerinfo" type="text/html">
+            <% for(i=0;i<data.content.length;i++){ %>
+            <tr>
+                <td><input type="checkbox" name="single" value="{{data.content[i].id}}"></td>
+                <td><%=data.content[i].id%></td>
+                <td><a href="listpapertest.html?paperId={{data.content[i].id}}"><%=data.content[i].title%></a></td>
+                <td><%=data.content[i].create_time%></td>
+                <td>
+                    <button class="btn btn-primary" onclick="del({{data.content[i].id}},2)">删除</button>
+                    <button class="btn btn-primary" onclick="detailpaper({{data.content[i].id}})">查看考试情况</button>
+                </td>
+            </tr>
+            <% } %>
+        </script>
+    <script id="pagerinfo" type="text/html">
+        {{if data.countPages>1}}
+            {{if data.page!=0}}
+            <li class="previous">
+                <a href="listtest.html?page={{data.page-1}}">«</a>
+            </li>
+            {{/if}}
+            <%for(i=1;i<=data.countPages;i++){%>
+                <li>
+                    <a href="listtest.html?page={{i}}">{{i}}</a>
+                </li>
+            <% } %>
+            {{if data.number!=data.page-1}}
+            <li class="next">
+                <a href="listtest.html?page={{data.page+2}}">»</a>
+            </li>
+            {{/if}}
+        {{/if}}
+        </script>
+    <nav class="navbar navbar-inverse navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row top">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-primary nav-stacked teacherOpt">
+                    <li>
+                        <a href="listuser.html">编辑用户</a>
+                    </li>
+                    <li>
+                        <a href="adduser.html">新增用户</a>
+                    </li>
+                    <li>
+                        <a href="listtest.html">预览试题</a>
+                    </li>
+                    <li>
+                        <a href="addtest.html">新增试题</a>
+                    </li>
+                    <li class="active">
+                        <a href="listpaper.html">预览试卷</a>
+                    </li>
+                    <li>
+                        <a href="createpaper.html">生成试卷</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-sm-9  col-md-10 main">
+                <form id="serachForm">
+                    <div class="row">
+                        <div class="input-group col-sm-3" style="float: left;">
+                            <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example" id="searchboxExample">
+                                <input id="serachInput" name="keyword" type="search" class="form-control search-input" placeholder="搜索">
+                                <label for="serachInput" class="input-control-icon-left search-icon">
+                                    <i class="icon icon-search"></i>
+                                </label>
+                            </div>
+                            <span class="input-group-btn">
+                                <button onclick="serach(1)" class="btn btn-primary" type="button">搜索</button>
+                            </span>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row">
+
+                                <label style="float: left;text-align: center;line-height: 32px;float: left;margin-left: 50px">开始时间：</label>
+                                <input name="beginDate" id="beginDate" type="date" style="width: 200px;" class="form-control">
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row">
+                                <label style="float: left;text-align: center;line-height: 32px;">结束时间：</label>
+                                <input name="endDate" id="endDate" type="date" style="width: 200px;float: left;" class="form-control">
+                                <button onclick="serach(2)" class="btn btn-primary" type="button">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" name="allSelected"></th>
+                            <th>id</th>
+                            <th>题目</th>
+                            <th>创建时间</th>
+                            <th>操作&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn btn-primary" type="button" onclick="delCb()">删除</button></th>
+                        </tr>
+                        </thead>
+                        <tbody id="main">
+
+                        </tbody>
+                    </table>
+                </div>
+                <ul class="pager">
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        var serach = function (e) {
+            if (e == 2 && $("#beginDate").val() == "") {
+                alert("请选择开始时间");
+            }
+            $.ajax({
+                type: "GET",
+                url: addr + "/api/papers",
+                data: $("#serachForm").serialize(),
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    if (data.content.length == 0) {
+                        new $.zui.Messager('提示信息：没有查到试卷', {
+                            type: "danger",
+                            time: 3000
+                        }).show();
+                        $(".pager").html("");
+                    } else {
+                        var html = template("listpagerinfo", { data: data });
+                        $("#main").html(html);
+                        var pager = template("pagerinfo", { data: data });
+                        $(".pager").html(pager);
+                    }
+                },
+                error: function (data) {
+                    new $.zui.Messager('提示信息：' + data.responseText, {
+                        type: "danger",
+                        time: 3000
+                    }).show();
+                }
+            });
+        }
+        var del = function (id,type) {
+            $.ajax({
+                type: "DELETE",
+                url: addr + "/api/papers/"+id,
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    if(type==1) {
+                        return true;
+                    }
+                    location.href = location.href;
+                },
+                error: function (data) {
+                    if(type==1) {
+                        return false;
+                    }
+                    new $.zui.Messager('提示信息：' + data.responseText, {
+                        type: "danger",
+                        time: 3000
+                    }).show();
+                }
+            });
+        }
+        var delCb=function () {
+            var f=false;
+            $("input[name='single']").each(function (index,el) {
+                if(el.checked){
+                    if(!del($(el).val(),1)){
+                        new $.zui.Messager('提示消息：'+$(el).val()+'号试卷已经有考试记录', {
+                            type: 'danger'
+                        }).show();
+                        f=true;
+                        return false;
+                    }
+                }
+            });
+            if(!f){
+                location.href=location.href;
+            }
+        }
+        var detailpaper = function (id) {
+            if (id != "") {
+                location.href = "studentinfo.html?pageId=" + id;
+            }
+        }
+    </script>
+</body>
+
+</html>

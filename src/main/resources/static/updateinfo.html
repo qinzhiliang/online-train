@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>新增试题</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+
+    <script src="js/template-web.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-primary nav-stacked teacherOpt">
+                <li>
+                    <a href="listuser.html">编辑用户</a>
+                </li>
+                <li>
+                    <a href="adduser.html">新增用户</a>
+                </li>
+                <li>
+                    <a href="listtest.html">预览试题</a>
+                </li>
+                <li>
+                    <a href="addtest.html">新增试题</a>
+                </li>
+                <li>
+                    <a href="listpaper.html">预览试卷</a>
+                </li>
+                <li>
+                    <a href="createpaper.html">生成试卷</a>
+                </li>
+            </ul>
+            <ul class="nav nav-primary nav-stacked studentOpt">
+                <li>
+                    <a href="choicepaper.html">在线考试</a>
+                </li>
+                <li>
+                    <a href="myscore.html">我的成绩</a>
+                </li>
+            </ul>
+        </div>
+
+            <div id="list" class="col-sm-9  col-md-10 main">
+                <form id="updateForm">
+                    <table class="table datatable">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <label>姓名：</label>
+                                </th>
+                                <th>
+                                    <!-- <input class="form-control" name="name"> -->
+                                    <label id="name"></label>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>用户名：</label>
+                                </td>
+                                <th>
+                                    <!-- <input class="form-control" name="username"> -->
+                                    <label id="username"></label>
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>旧密码：</label>
+                                </td>
+                                <th>
+                                    <input class="form-control" name="oldPassword">
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>新密码：</label>
+                                </td>
+                                <th>
+                                    <input class="form-control" name="newPassword">
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>重复密码：</label>
+                                </td>
+                                <th>
+                                    <input class="form-control" name="repeatPassword">
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <button onclick="update()" class="btn btn-primary" type="button">更新</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            $.ajax({
+                url: addr + "/api/users/current",
+                type: "GET",
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    $("#name").text(data.name);
+                    $("#username").text(data.username);
+                },
+                error: function (data) {
+                    new $.zui.Messager('提示消息：' + data.responseText, {
+                        type: 'error'
+                    }).show();
+                    location.href = "login.html";
+                }
+            });
+        });
+        var update = function () {
+            if ($("input[name='oldPassword']").val()==""){
+                new $.zui.Messager('提示消息：请输入旧密码', {
+                    type: 'error',
+                    time:1000
+                }).show();
+                return false;
+            }
+            if($("input[name='newPassword']").val()==""){
+                new $.zui.Messager('提示消息：请输入新密码', {
+                    type: 'error',
+                    time:1000
+                }).show();
+                return false;
+            }
+            if($("input[name='repeatPassword']").val()==""){
+                new $.zui.Messager('提示消息：请输入确认密码', {
+                    type: 'error',
+                    time:1000
+                }).show();
+                return false;
+            }
+            if($("input[name='repeatPassword']").val()!=$("input[name='newPassword']").val()){
+                new $.zui.Messager('提示消息：确认密码不相同', {
+                    type: 'error',
+                    time:1000
+                }).show();
+                return false;
+            }
+            $.ajax({
+                url: addr + "/api/users/password",
+                type: "PUT",
+                data: JSON.stringify($("#updateForm").serializeObject()),
+                contentType:"application/json; charset=utf-8",
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    new $.zui.Messager('提示消息：更新成功', {
+                        type: 'success',
+                        time:1000
+                    }).show();
+                    location.href="login.html";
+                },
+                error: function (data) {
+                    new $.zui.Messager('提示消息：'+ data.responseText, {
+                        type: 'error',
+                        time:1000
+                    }).show();
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body>
+    <!-- 登录窗口 -->
+    <div id="login" class="modal fade"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+            </div>
+            <div class="modal-title">
+                <h1 class="text-center">登录</h1>
+            </div>
+            <div class="modal-body">
+                <form id="form" class="form-group">
+                    <div class="form-group">
+                        <label for="">用户名</label>
+                        <input class="form-control" autofocus name="username" type="text" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="">密码</label>
+                        <input class="form-control" name="password" type="password" placeholder="">
+                    </div>
+                    <div class="text-right">
+                        <button class="btn btn-primary" type="button" onclick="login()">登录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        var addr="http://127.0.0.1:8000";
+        var login = function () {
+            $.ajax({
+                type: "POST",
+                url: addr + "/auth/login",
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                data: $("#form").serialize(),
+                success: function (data) {
+                    if (data == 1) {
+                        location.href = "listuser.html";
+                    }
+                    else if (data == 2) {
+                        location.href = "choicepaper.html";
+                    } else {
+                        alert("登录失败");
+                    }
+                },
+                error: function (data) {
+                    if (data.responseText != "") {
+                        alert(data.responseText);
+                    } else
+                        alert("网络异常");
+                }
+            }
+            );
+        }
+
+    </script>
+</body>
+
+</html>

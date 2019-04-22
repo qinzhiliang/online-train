@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>预览试题</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+    <link href="zui/lib/datatable/zui.datatable.min.css" rel="stylesheet">
+    <script src="zui/lib/datatable/zui.datatable.min.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+
+    <script src="js/template-web.js"></script>
+
+    <script>
+
+        $(function () {
+            var page = getParam("page=");
+            $.ajax({
+                type: "GET",
+                url: addr + "/api/topics?page=" + page,
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    var html = template("listtestinfo", { data: data});
+                    $("#main").html(html);
+                    var pager = template("pagerinfo", { data: data });
+                    $(".pager").html(pager);
+                    $("#li"+page).addClass("active");
+                }
+            });
+        })
+    </script>
+</head>
+
+<body>
+    <script id="listtestinfo" type="text/html">
+        <% for(i=0;i<data.content.length;i++){ %>
+            <tr>
+                <td><input type="checkbox" name="single" value="{{data.content[i].id}}"></td>
+                <td>{{data.content[i].id}}</td>
+                <td>
+                {{if data.content[i].topicType==2}}
+                    <span>多选题</span>
+                {{else if data.content[i].topicType==1}}
+                    <span>单选题</span>
+                {{else}}
+                    <span>判断题</span>
+                {{/if}}
+                </td>
+                <td>
+                <label>{{i+1}}. <%=data.content[i].title%></label>
+                </td>
+                <td>
+                <button class="btn btn-primary" type="button" onclick="del({{data.content[i].id}},2)">删除</button>
+                <button class="btn btn-primary" type="button" onclick="update({{data.content[i]}})">查看</button>
+                </td>
+            </tr>
+
+
+        <% } %>
+    </script>
+    <script id="pagerinfo" type="text/html">
+        {{if data.totalPages>1}}
+            {{if data.number!=0}}
+            <li class="previous">
+                <a onclick="serach(3,{{data.number-1}})" href="javascript:void(0)">«</a>
+            </li>
+            {{/if}}
+                {{if data.number>5}}
+                    {{if data.number+5<data.totalPages}}
+                    <%for(i=data.number-4;i<=data.number+5;i++){%>
+                        <li id="li{{i}}">
+                            <a onclick="serach(3,{{i}})" href="javascript:void(0)">{{i}}</a>
+                        </li>
+                    <% } %>
+                    {{else}}
+                    <%for(i=data.totalPages-9;i<=data.totalPages;i++){%>
+                    <li id="li{{i}}">
+                        <a onclick="serach(3,{{i}})" href="javascript:void(0)">{{i}}</a>
+                    </li>
+                    <% } %>
+                    {{/if}}
+                {{else}}
+                    {{if data.totalPages>=10}}
+                        <%for(i=1;i<=10;i++){%>
+                            <li id="li{{i}}">
+                                <a onclick="serach(3,{{i}})" href="javascript:void(0)">{{i}}</a>
+                            </li>
+                        <% } %>
+                    {{else}}
+                        <%for(i=1;i<=data.totalPages;i++){%>
+                        <li id="li{{i}}">
+                            <a onclick="serach(3,{{i}})" href="javascript:void(0)">{{i}}</a>
+                        </li>
+                        <% } %>
+                    {{/if}}
+                {{/if}}
+            {{if data.number!=data.totalPages-1}}
+            <li class="next">
+                <a onclick="serach(3,{{data.number+2}})" href="javascript:void(0)">»</a>
+            </li>
+            {{/if}}
+        {{/if}}
+    </script>
+    <nav class="navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row top">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-primary nav-stacked teacherOpt">
+                    <li>
+                        <a href="listuser.html">编辑用户</a>
+                    </li>
+                    <li>
+                        <a href="adduser.html">新增用户</a>
+                    </li>
+                    <li class="active">
+                        <a href="listtest.html">预览试题</a>
+                    </li>
+                    <li>
+                        <a href="addtest.html">新增试题</a>
+                    </li>
+                    <li>
+                        <a href="listpaper.html">预览试卷</a>
+                    </li>
+                    <li>
+                        <a href="createpaper.html">生成试卷</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="list" class="col-sm-9  col-md-10 main">
+                <form id="serachForm">
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <select name="topicType" class="form-control">
+                                <option value="">全部</option>
+                                <option value="1">单选</option>
+                                <option value="2">多选</option>
+                                <option value="3">判断</option>
+                            </select>
+                        </div>
+                        <div class="input-group col-sm-3" style="float: left;">
+                            <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example" id="searchboxExample">
+                                <input id="serachInput" name="keyword" type="search" class="form-control search-input" placeholder="搜索">
+                                <label for="serachInput" class="input-control-icon-left search-icon">
+                                    <i class="icon icon-search"></i>
+                                </label>
+                            </div>
+                            <span class="input-group-btn">
+                                <button onclick="serach(1)" class="btn btn-primary" type="button">搜索</button>
+                            </span>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row">
+
+                                <label style="float: left;text-align: center;line-height: 32px;float: left;margin-left: 50px">开始时间：</label>
+                                <input name="beginDate" id="beginDate" type="date" style="width: 200px;" class="form-control">
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row">
+                                <label style="float: left;text-align: center;line-height: 32px;">结束时间：</label>
+                                <input name="endDate" id="endDate" type="date" style="width: 200px;float: left;" class="form-control">
+                                <button onclick="serach(2)" class="btn btn-primary" type="button">确认</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <table class="table datatable">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" name="allSelected"></th>
+                            <th>#</th>
+                            <th>类型</th>
+
+                            <th class="flex-col" data-width="300">题目</th>
+                            <th>操作&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn btn-primary" type="button" onclick="delCb()">删除</button></th>
+                        </tr>
+                        </thead>
+                        <tbody id="main">
+
+                        </tbody>
+                    </table>
+                    <ul class="pager">
+
+                    </ul>
+                    <input hidden id="pageinput" name="page" value="1">
+                </form>
+                <form id="updateForm">
+                    <div class="modal fade" id="myLgModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span aria-hidden="true">×</span>
+                                        <span class="sr-only">关闭</span>
+                                    </button>
+                                    <h4 class="modal-title">修改试题</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div>
+                                        <label for="topicType" style="float: left;line-height: 32px;">试题类型：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                        <select onchange="changeOption(this)" class="form-control" style="width: 30%;" id="topicType" name="topicType">
+                                            <option value="1">单选题</option>
+                                            <option value="2">多选题</option>
+                                            <option value="3">判断题</option>
+                                        </select>
+                                        &nbsp;
+                                    </div>
+                                    <div>
+                                        <label style="float: left;">试题题目：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                        <textarea rows="7" style="width: 60%;" class="form-control" id="title" name="title"></textarea> &nbsp;
+                                    </div>
+                                    <div class="option">
+                                        <div style="clear: both;">
+                                            <div class="checkbox " style="float: left;">
+                                                <label>选项A：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                <br>
+                                                <label>
+                                                    <input class="typeInput" type="radio" name="answer" value="1">正确
+                                                </label>
+                                            </div>
+                                            <textarea class="form-control" id="option1" style="width: 60%;" name="option1"></textarea>
+                                        </div>
+                                        <div style="clear: both;">
+
+                                            <div class="checkbox " style="float: left;">
+                                                <label>选项B：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                <br>
+                                                <label>
+                                                    <input class="typeInput" type="radio" name="answer" value="2">正确
+                                                </label>
+                                            </div>
+                                            <textarea class="form-control" id="option2" style="width: 60%;" name="option2"></textarea>
+
+                                        </div>
+                                        <div style="clear: both;">
+
+                                            <div class="checkbox " style="float: left;">
+                                                <label>选项C：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                <br>
+                                                <label>
+                                                    <input class="typeInput" type="radio" name="answer" value="3">正确
+                                                </label>
+                                            </div>
+                                            <textarea class="form-control" id="option3" style="width: 60%;" name="option3"></textarea>
+
+                                        </div>
+                                        <div style="clear: both;">
+                                            <div class="checkbox" style="float: left;">
+                                                <label>选项D：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                <br>
+                                                <label>
+                                                    <input class="typeInput" type="radio" name="answer" value="4">正确
+                                                </label>
+                                            </div>
+                                            <textarea class="form-control" id="option4" style="width: 60%;" name="option4"></textarea>
+                                        </div>
+                                    </div>
+                                    <div id="option" hidden>
+                                        <div class="checkbox" style="float: left;">
+                                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <input class="typeInput" type="radio" name="answer" value="1">正确
+                                            </label>
+                                            <label>
+                                                <input class="typeInput" type="radio" name="answer" value="2">错误
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                    <button type="button" class="btn btn-primary" onclick="updateOk()">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        var serach = function (e,page) {
+            if(e==3){
+                $("#pageinput").val(page);
+            }
+            if (e == 2 && $("#beginDate").val() == "") {
+                alert("请选择开始时间");
+            }
+            $.ajax({
+                type: "GET",
+                url: addr + "/api/topics",
+                data: $("#serachForm").serialize(),
+                crossDomain: true,
+                xhrFields: {withCredentials: true},
+                success: function (data) {
+                    if (data.content.length == 0) {
+                        new $.zui.Messager('提示信息：没有查到试题', {
+                            type: "danger",
+                            time: 3000
+                        }).show();
+                        $(".pager").html("");
+                    } else {
+                        var html = template("listtestinfo", {data: data});
+                        $("#main").html(html);
+                        var pager = template("pagerinfo", {data: data});
+                        $(".pager").html(pager);
+                            $("li").removeClass("active");
+                            var p=$("#pageinput").val();
+                            $("#li"+p).addClass("active");
+                    }
+                },
+                error: function (data) {
+                    new $.zui.Messager('提示信息：' + data.responseText, {
+                        type: "danger",
+                        time: 3000
+                    }).show();
+                }
+            });
+        }
+        var idtemp = -1;
+        var updateOk = function () {
+            var obj = $("#updateForm").serialize();
+            $.ajax({
+                method: "PUT",
+                url: addr + "/api/topics/" + idtemp,
+                data: obj,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    location.href = location.href;
+                },
+                error: function (data) {
+                    alert("修改错误");
+                }
+            });
+        }
+        var changeOption = function (e) {
+            var val = $(e).val();
+            if (val == 2) {
+                $(".typeInput").attr("type", "checkbox");
+                $(".option").show();
+                $("#option").hide();
+            } else if (val == 1) {
+                $(".typeInput").attr("type", "radio");
+                $(".option").show();
+                $("#option").hide();
+            } else {
+                $(".option").hide();
+                $("#option").show();
+            }
+        }
+        var del = function (id,type) {
+            $.ajax({
+                url: addr + "/api/topics/" + id,
+                type: "DELETE",
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function () {
+                    if(type==1) {
+                        return true;
+                    }
+                    location.href = location.href;
+                },
+                error: function (data) {
+                    if(type==1) {
+                        return false;
+                    }
+                    new $.zui.Messager('提示消息：' + data.responseText, {
+                        type: 'danger',
+                        time: 3000
+                    }).show();
+                }
+            });
+        }
+        var delCb=function () {
+            var f=false;
+            $("input[name='single']").each(function (index,el) {
+                if(el.checked){
+                    if(!del($(el).val(),1)){
+                        new $.zui.Messager('提示消息：'+$(el).val()+'号试题已经生成过试卷', {
+                            type: 'danger'
+                        }).show();
+                        f=true;
+                        return false;
+                    }
+                }
+            });
+            if(!f){
+                location.href=location.href;
+            }
+        }
+        var update = function (data) {
+            idtemp = data.id;
+            $('#myLgModal').modal({
+                keyboard: false,
+                show: true
+            })
+            $("#topicType").val(data.topicType);
+            var val = data.topicType;
+            if (val == 2) {
+                $(".typeInput").attr("type", "checkbox");
+                $(".option").show();
+                $("#option").hide();
+            } else if (val == 1) {
+                $(".typeInput").attr("type", "radio");
+                $(".option").show();
+                $("#option").hide();
+            } else {
+                $(".option").hide();
+                $("#option").show();
+            }
+            $("#title").val(data.title);
+            for (var i = 1; i <= data.topicOptions.length; i++) {
+                $("#option" + i).val(data.topicOptions[i - 1].title);
+            }
+            for (var i = 0; i < data.answers.length; i++) {
+                $(".typeInput:eq(" + (data.answers[i] - 1) + ")").attr("checked", true);
+            }
+        }
+    </script>
+</body>
+
+</html>

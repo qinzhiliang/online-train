@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>学生成绩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+    <script>
+        $(function () {
+            var id = getParam("pageId=");
+            $.ajax({
+                type: "GET",
+                url: addr + "/api/exams/paper/" + id,
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    var html = template("listscoreinfo", { data: data });
+                    $("#main").html(html);
+                },
+                error: function (data) {
+
+                }
+            });
+        })
+    </script>
+</head>
+
+<body>
+    <script id="listscoreinfo" type="text/html">
+        <div class="page-header">
+            <label><big>{{data[0].paperTitle}}</big></label>
+        </div>
+        <% for(i=0;i<data.length;i++){ %>
+            <div class="page-header">
+                <div>
+                    {{if data[i].user!=null}}
+                        <label>姓名：</label>
+                        <label>
+                            {{data[i].user.name}}
+                        </label>
+                        {{/if}}
+                </div>
+                    <label>考试状态：</label>
+                    <label>
+                        {{if data[i].examStatus==1}}
+                            考试中
+                        {{else}}
+                            考试结束
+                        {{/if}}
+                    </label>
+                <div>
+                    <label>考试时间：</label>
+                    <label>{{data[i].createTime}}</label>
+                </div>
+                <div>
+                    <label>分数：</label>                     
+                    <label>
+                        {{if data[i].score==null}}
+                            无
+                        {{else}}
+                            {{data[i].score}}分
+                        {{/if}}
+                        
+                    </label>
+                </div>
+            </div>
+        <% } %>
+    </script>
+    <nav class="navbar navbar-inverse navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row top">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-primary nav-stacked teacherOpt">
+                    <li>
+                        <a href="listuser.html">编辑用户</a>
+                    </li>
+                    <li>
+                        <a href="adduser.html">新增用户</a>
+                    </li>
+                    <li>
+                        <a href="listtest.html">预览试题</a>
+                    </li>
+                    <li>
+                        <a href="addtest.html">新增试题</a>
+                    </li>
+                    <li class="active">
+                        <a href="listpaper.html">预览试卷</a>
+                    </li>
+                    <li>
+                        <a href="createpaper.html">生成试卷</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-sm-9  col-md-10 main">
+                <div class="text-right">
+                    <button class="btn btn-primary" onclick="back()">返回</button>
+                </div>
+                <div id="main">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var back = function () {
+            location.href = "listpaper.html";
+        }
+    </script>
+</body>
+
+</html>

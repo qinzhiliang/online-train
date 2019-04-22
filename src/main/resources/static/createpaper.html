@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>添加用户</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row top">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-primary nav-stacked teacherOpt">
+                    <li>
+                        <a href="listuser.html">编辑用户</a>
+                    </li>
+                    <li>
+                        <a href="adduser.html">新增用户</a>
+                    </li>
+                    <li>
+                        <a href="listtest.html">预览试题</a>
+                    </li>
+                    <li>
+                        <a href="addtest.html">新增试题</a>
+                    </li>
+                    <li>
+                        <a href="listpaper.html">预览试卷</a>
+                    </li>
+                    <li class="active">
+                        <a href="createpaper.html">生成试卷</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-sm-9  col-md-10 main">
+                <div>
+                    <form id="genForm">
+                        <table>
+                            <tr>
+                                <td>
+                                    <label>分数(凑满100分)</label>
+                                </td>
+                                <td>
+                                    <i style="color: red;font-size: 20px;" id="score">0</i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>试卷标题</label>
+                                </td>
+                                <td>
+                                    <input name="title" class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>单选题个数（1分/个）</label>
+                                </td>
+                                <td>
+                                    <input name="number1" oninput="checkNumber(this,1)" class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>
+                                        多选题个数（2分/个）
+                                    </label>
+                                </td>
+                                <td>
+                                    <input name="number2" oninput="checkNumber(this,2)" class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>判断题个数（0.5分/个）</label>
+                                </td>
+                                <td>
+                                    <input name="number3" oninput="checkNumber(this,0.5)" class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div class="text">
+                                        <button id="genbtn" onclick="commit()" type="button" disabled class="btn btn-primary">生成试卷</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var commit = function () {
+            $("#genbtn").attr("disabled", true);
+            if ($("input[name='title']").val() == "") {
+                alert("请输入试卷标题");
+                $("#genbtn").removeAttr("disabled");
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: addr + "/api/papers",
+                    async: true,
+                    crossDomain: true,
+                    xhrFields: { withCredentials: true },
+                    data: $("#genForm").serialize(),
+                    success: function (data) {
+                        new $.zui.Messager('提示消息：试卷生成成功', {
+                            type: 'success',
+                            time: 2000
+                        }).show();
+                        $("input[name='number1']").val("");
+                        $("input[name='number2']").val("");
+                        $("input[name='number3']").val("");
+                        $("#genbtn").attr("disabled", true);
+                    },
+                    error: function (data) {
+                        new $.zui.Messager('提示消息：' + data.responseText, {
+                            type: 'danger',
+                            time: 3000
+                        }).show();
+                        $("#genbtn").removeAttr("disabled");
+                    }
+                });
+            }
+        }
+        var score = 0;
+        var checkNumber = function (e, v) {
+            var val = $(e).val();
+            var reg = /^[0-9]*$/;
+            if (!reg.test(val)) {
+                if (val.length == 1) {
+                    $(e).val("");
+                } else {
+                    $(e).val(val.substring(0, val.length - 1));
+                }
+            }
+            var score1 = parseInt($("input[name='number1']").val()) * 1;
+            var score2 = parseInt($("input[name='number2']").val()) * 2;
+            var score3 = parseInt($("input[name='number3']").val()) * 0.5;
+            if (!isNaN(score1)) {
+                score = score + score1;
+            }
+            if (!isNaN(score2)) {
+                score = score + score2;
+            }
+            if (!isNaN(score3)) {
+                score = score + score3;
+            }
+            $("#score").text(score);
+            if (score == 100) {
+                $("#genbtn").removeAttr("disabled");
+            } else {
+                $("#genbtn").attr("disabled", true);
+            }
+            score = 0;
+        }
+    </script>
+</body>
+
+</html>

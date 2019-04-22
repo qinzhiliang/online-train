@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>在线测试</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+    <script>
+        $(function () {
+            var paperId = getParam("paperId=");
+
+            var examId = getParam("examId=");
+            $.ajax({
+                type: "GET",
+                url: addr + "/api/papers/" + paperId,
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    var html = template("listtestinfo", { data: data });
+                    $("#main").html(html);
+                }
+            });
+        })
+    </script>
+</head>
+
+<body>
+<script id="listtestinfo" type="text/html">
+    <div class="page-header">
+        <b style="font-size: 20px;"><%=data.title%></b>
+    </div>
+    <% for(i=0;i<data.topics.length;i++){ %>
+    <div class="content panel-body row">
+        <div class="col-md-10">
+            {{if data.topics[i].topicType==2}}
+            <span>多选题</span><br>
+            <label>{{i+1}}. <%=data.topics[i].title%></label>
+            <ol type="A">
+            <% for(j=0;j<data.topics[i].topicOptions.length;j++){ %>
+                    <li onchange="changeAnswer({{data}})" type="checkbox" name="option{{data.topics[i].id}}" class="answer" value="{{j+1}}"> <%=data.topics[i].topicOptions[j].title%>
+            <% } %>
+            </ol>
+            {{else if data.topics[i].topicType==1}}
+            <span>单选题</span><br>
+
+            <label>{{i+1}}. <%=data.topics[i].title%></label>
+            <ol type="A">
+            <% for(j=0;j<data.topics[i].topicOptions.length;j++){ %>
+                    <li onchange="changeAnswer({{data}})"  name="option{{data.topics[i].id}}" class="answer" value="{{j+1}}"> <%=data.topics[i].topicOptions[j].title%>
+            <% } %>
+            </ol>
+            {{else}}
+            <span>判断题</span><br>
+
+            <label>{{i+1}}. <%=data.topics[i].title%></label>
+            <ol type="A">
+            <% for(j=0;j<data.topics[i].topicOptions.length;j++){ %>
+                    <li onchange="changeAnswer({{data}})"  name="option{{data.topics[i].id}}" class="answer" value="{{j+1}}"> <%=data.topics[i].topicOptions[j].title%>
+            <% } %>
+            </ol>
+            {{/if}}
+            <label>
+                答案为：{{data.topics[i].answers}}
+            </label>
+        </div>
+    </div>
+    <% } %>
+</script>
+<nav class="navbar navbar-inverse navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">在线考试</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a><span id="account"></span></a></li>
+                <li>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="updateinfo.html">修改密码</a>
+                        </li>
+                        <li>
+                            <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                        </li>
+                    </ul>
+                </li>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row top">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-primary nav-stacked teacherOpt">
+                <li>
+                    <a href="listuser.html">编辑用户</a>
+                </li>
+                <li>
+                    <a href="adduser.html">新增用户</a>
+                </li>
+                <li>
+                    <a href="listtest.html">预览试题</a>
+                </li>
+                <li>
+                    <a href="addtest.html">新增试题</a>
+                </li>
+                <li class="active">
+                    <a href="listpaper.html">预览试卷</a>
+                </li>
+                <li>
+                    <a href="createpaper.html">生成试卷</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-sm-9  col-md-10 main">
+            <div id="main">
+
+            </div>
+            <button class="btn btn-primary" type="button" onclick="ret()">返回</button>
+        </div>
+    </div>
+</div>
+<script>
+    var ret=function () {
+        location.href="listpaper.html";
+    }
+</script>
+</body>
+</html>

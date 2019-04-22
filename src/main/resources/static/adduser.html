@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>添加用户</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row top">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-primary nav-stacked teacherOpt">
+                    <li>
+                        <a href="listuser.html">编辑用户</a>
+                    </li>
+                    <li class="active">
+                        <a href="adduser.html">新增用户</a>
+                    </li>
+                    <li>
+                        <a href="listtest.html">预览试题</a>
+                    </li>
+                    <li>
+                        <a href="addtest.html">新增试题</a>
+                    </li>
+                    <li>
+                        <a href="listpaper.html">预览试卷</a>
+                    </li>
+                    <li>
+                        <a href="createpaper.html">生成试卷</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-sm-9  col-md-10 main">
+
+                <div class="text-right">
+                    <button class="btn btn-primary" onclick="add()" type="button">添加</button>
+                </div>
+                <form id="form" class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>姓名</th>
+                                <th>角色</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb">
+                            <tr>
+                                <th>
+                                    <input class="form-control required" name="username" type="text" placeholder="">
+                                </th>
+                                <th>
+                                    <input class="form-control required" name="name" type="text" placeholder="">
+                                </th>
+                                <th>
+                                    <select class="form-control" name="role">
+                                        <option value="2">学生</option>
+                                        <option value="1">老师</option>
+                                    </select>
+                                </th>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <button class="btn btn-primary" onclick="commit()" type="button">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        var add = function () {
+            $("#tb").append(
+                '<tr><th>' +
+                '<input class="form-control required" name="username" type="text" placeholder="">' +
+                '</th>' +
+                '<th>' +
+                '<input class="form-control required" name="name" type="text" placeholder="">' +
+                '</th>' + '<th><select class="form-control"><option>学生</option><option>老师</option></select></th></tr>'
+            );
+        }
+        var commit = function () {
+            $.ajax({
+                type: "POST",
+                url: addr + "/api/users",
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                data: $("#form").serialize(),
+                success: function (data) {
+                    if (data.id != null) {
+                        new $.zui.Messager('提示消息：添加成功', {
+                            type: 'success',
+                            time: 2000
+                        }).show();
+                    }
+                },
+                error: function (data) {
+                    new $.zui.Messager('提示消息：'+data.responseText, {
+                        type: 'danger',
+                        time: 3000
+                    }).show();
+                }
+            });
+        }
+        JSON.st
+    </script>
+</body>
+
+</html>

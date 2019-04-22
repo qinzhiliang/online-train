@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>新增试题</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+
+    <script src="js/template-web.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row top">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-primary nav-stacked teacherOpt">
+                    <li>
+                        <a href="listuser.html">编辑用户</a>
+                    </li>
+                    <li>
+                        <a href="adduser.html">新增用户</a>
+                    </li>
+                    <li>
+                        <a href="listtest.html">预览试题</a>
+                    </li>
+                    <li class="active">
+                        <a href="addtest.html">新增试题</a>
+                    </li>
+                    <li>
+                        <a href="listpaper.html">预览试卷</a>
+                    </li>
+                    <li>
+                        <a href="createpaper.html">生成试卷</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div id="list" class="col-sm-9  col-md-10 main">
+                <form id="topicsForm" style="padding-left: 20px;padding-right: 20px;">
+                    <div>
+                        <label for="topicType" style="float: left;line-height: 32px;">试题类型：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <select onchange="changeOption(this)" class="form-control" style="width: 30%;" name="topicType">
+                            <option value="1">单选题</option>
+                            <option value="2">多选题</option>
+                            <option value="3">判断题</option>
+                        </select>
+                        &nbsp;
+                    </div>
+                    <div>
+                        <label style="float: left;">试题题目：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <textarea rows="7" style="width: 60%;" class="form-control" name="title"></textarea> &nbsp;
+                    </div>
+
+                    <div class="option">
+                        <div style="clear: both;">
+
+                            <div class="checkbox " style="float: left;">
+                                <label>选项A：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <br>
+                                <label>
+                                    <input class="typeInput" type="radio" name="answer" value="1">正确
+                                </label>
+                            </div>
+                            <textarea class="form-control " style="width: 60%;" name="option1"></textarea>
+
+                        </div>
+                        <div style="clear: both;">
+
+                            <div class="checkbox " style="float: left;">
+                                <label>选项B：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <br>
+                                <label>
+                                    <input class="typeInput" type="radio" name="answer" value="2">正确
+                                </label>
+                            </div>
+                            <textarea class="form-control " style="width: 60%;" name="option2"></textarea>
+
+                        </div>
+                        <div style="clear: both;">
+
+                            <div class="checkbox " style="float: left;">
+                                <label>选项C：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <br>
+                                <label>
+                                    <input class="typeInput" type="radio" name="answer" value="3">正确
+                                </label>
+                            </div>
+                            <textarea class="form-control" style="width: 60%;" name="option3"></textarea>
+
+                        </div>
+                        <div style="clear: both;">
+
+                            <div class="checkbox" style="float: left;">
+                                <label>选项D：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                <br>
+                                <label>
+                                    <input class="typeInput" type="radio" name="answer" value="4">正确
+                                </label>
+                            </div>
+                            <textarea class="form-control" style="width: 60%;" name="option4"></textarea>
+
+                        </div>
+                    </div>
+                    <div id="option" hidden>
+                        <div class="checkbox" style="float: left;">
+                            <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <input class="typeInput" type="radio" name="answer" value="1">正确
+                            </label>
+                            <label>
+                                <input class="typeInput" type="radio" name="answer" value="2">错误
+                            </label>
+                        </div>
+                    </div>
+                    <div class="text-right" style="margin-top: 10px;">
+                        <button class="btn btn-primary">清空</button>
+                        <button onclick="commit()" type="button" class="btn btn-primary">提交</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        var changeOption = function (e) {
+            var val = $(e).val();
+            if (val == 2) {
+                $(".typeInput").attr("type", "checkbox");
+                $(".option").show();
+                $("#option").hide();
+            } else if (val == 1) {
+                $(".typeInput").attr("type", "radio");
+                $(".option").show();
+                $("#option").hide();
+            } else {
+                $(".option").hide();
+                $("#option").show();
+            }
+        }
+        var commit = function () {
+            var data = $("#topicsForm").serialize();
+            $.ajax({
+                url: addr + "/api/topics",
+                type: "POST",
+                xhrFields: { withCredentials: true },
+                data: data,
+                async: true,
+                crossDomain: true,
+                success: function (data) {
+                    new $.zui.Messager('提示消息：添加成功', {
+                        type: 'success',
+                        time:2000
+                    }).show();
+                },
+                error: function (data) {
+                    new $.zui.Messager('提示消息：' + data.responseText, {
+                        type: 'danger',
+                        time:3000
+                    }).show();
+                }
+            });
+        }
+        var logout = function () {
+            $.ajax({
+                url: addr + "/auth/logout",
+                type: "POST",
+                xhrFields: { withCredentials: true },
+                async: true,
+                crossDomain: true,
+                success: function (data) {
+                    location.href = "login.html";
+                },
+                error: function (data) {
+                    alert("登出失败");
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

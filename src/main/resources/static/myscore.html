@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>学生成绩</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="zui/lib/jquery/jquery.js"></script>
+    <script type="text/javascript" src="zui/js/zui.min.js"></script>
+    <script src="js/template-web.js"></script>
+    <script src="zui/lib/chart/zui.chart.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <link href="css/main.css">
+    <link href="zui/css/zui.min.css" rel="stylesheet" type="text/css">
+    <script>
+        $(function () {
+            $.ajax({
+                type: "GET",
+                url: addr + "/api/exams/user",
+                async: true,
+                crossDomain: true,
+                xhrFields: { withCredentials: true },
+                success: function (data) {
+                    if (data.length == 0) {
+                        new $.zui.Messager('提示消息：你还没有参加过考试', {
+                            type: 'warning',
+                            time: 3000
+                        }).show();
+                    } else {
+                        var html = template("listscoreinfo", { data: data });
+                        $("#main").html(html);
+                    }
+                },
+                error: function (data) {
+                    new $.zui.Messager('提示消息：'+data.responseText, {
+                        type: 'danger',
+                        time: 3000
+                    }).show();
+                }
+            });
+        })
+    </script>
+</head>
+
+<body>
+    <script id="listscoreinfo" type="text/html">
+            <% for(i=0;i<data.length;i++){ %>
+                <div class="page-header">
+                    <div>
+                        <label>{{i+1}}、</label>
+                        <label>{{data[i].paperTitle}}</label>
+                    </div>
+                        <label>考试状态：</label>
+                        <label>
+                            {{if data[i].examStatus==1}}
+                                考试中
+                            {{else}}
+                                考试结束
+                            {{/if}}
+                        </label>
+                    <div>
+                        <label>考试时间：</label>
+                        <label>{{data[i].createTime}}</label>
+                    </div>
+                    <div>
+                        <label>分数：</label>                     
+                        <label>
+                            {{if data[i].score==null}}
+                                0分
+                            {{else}}
+                                {{data[i].score}}分
+                            {{/if}}
+                            
+                        </label>
+                    </div>
+                </div>
+            <% } %>
+        </script>
+
+    <nav class="navbar navbar-inverse navbar navbar-inverse ">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">在线考试</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><span id="account"></span></a></li>
+                    <li>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">账号
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="updateinfo.html">修改密码</a>
+                            </li>
+                            <li>
+                                <a onclick="logout()" href="javascript:void(0);">退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row top">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-primary nav-stacked studentOpt">
+                    <li>
+                        <a href="choicepaper.html">在线考试</a>
+                    </li>
+                    <li>
+                        <a href="myscore.html">我的成绩</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-sm-9  col-md-10 main">
+                <form>
+                    <div class="row">
+
+
+                    </div>
+                </form>
+                <div id="main">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+    </script>
+</body>
+
+</html>
